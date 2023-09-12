@@ -160,7 +160,7 @@
       let messageProgressArray = queueMessageProgresses[queueId];
       let messagesBeingServiced = currentQueueMessageCounts[queueId];
       let lastQueuedMessageProgress = messageProgressArray.slice(-1)[0] ?? 0;
-      let servicingDelayMs = 50;
+      let servicingDelayMs = 75;
 
       queueDuration = 
                     queueDuration // How long it would take to service if 0 messages in queue
