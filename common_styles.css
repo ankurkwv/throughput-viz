@@ -21,3 +21,33 @@ body {
 #frame {
 	position: relative;
 }
+
+.menu {
+    background:  #0e0e0e;
+    text-align: center;
+    padding: 20px 0;
+}
+
+.menu button {
+    margin-right: 5px;
+    font-family: "Arial Black";
+    color: white;
+    background: rgb(22 27 36);
+    border: solid 1px rgb(96 117 156);
+    border-radius: 4px;
+    padding: 5px 30px;
+}
+
+.menu button:hover {
+    background: rgb(96 117 156);
+    cursor: pointer;
+}
+
+.menu button:active {
+    color: #efefef;
+    background: #0e0e0e;
+}
+
+.menu button:last-of-type {
+    margin-right: 0;
+}

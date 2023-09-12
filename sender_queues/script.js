@@ -1,6 +1,10 @@
   let queueMessageProgresses = [];
   let currentQueueMessageCounts = [];
   let messageIds = [];
+  let timeoutIds = [];
+  let playButton = document.querySelector("#play");
+  const urlParams = new URLSearchParams(window.location.search);
+  const autoplay = urlParams.get('autoplay');
 
   let titles = [
       { 
@@ -26,10 +30,10 @@
   let POSITIONS;
 
   let ANIMATION_ORDERS = [
-      {queueId: 'queue-1', startDelay: 0, messageSpacing: 10, messageCount: 100},
+      {queueId: 'queue-1', startDelay: 0, messageSpacing: 10, messageCount: 30},
       {queueId: 'queue-2', startDelay: 0, messageSpacing: 100, messageCount: 20},
-      {queueId: 'queue-3', startDelay: 2000, messageSpacing: 100, messageCount: 10},
-      {queueId: 'queue-3', startDelay: 1500, messageSpacing: 10, messageCount: 50},
+      {queueId: 'queue-1', startDelay: 2000, messageSpacing: 100, messageCount: 10},
+      {queueId: 'queue-3', startDelay: 1500, messageSpacing: 10, messageCount: 100},
   ];
 
   const QUEUE_CONFIGS = [
@@ -105,9 +109,29 @@
     });
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
+  const resetAnimations = () => {
+    // Step 1: Clear all timeouts
+    timeoutIds.forEach(timeoutId => clearTimeout(timeoutId));
+    timeoutIds = [];
 
-      const svg = document.querySelector("svg");
+    // Step 2: Reset state variables
+    queueMessageProgresses = [];
+    currentQueueMessageCounts = [];
+    messageIds = [];
+
+    // Step 3: Remove dynamically created elements
+    const svg = document.querySelector("svg");
+    anime.remove('.message-clone');
+    svg.querySelectorAll(".message-clone").forEach(el => el.remove());
+
+    // Step 4: Restart animations from the beginning
+    // (You might want to put the initialization code in a separate function so you can call it here)
+    initializeAnimations();
+  };
+
+  const initializeAnimations = () => {
+    playButton.innerText = 'Restart'
+    const svg = document.querySelector("svg");
       const icon_message_el = document.querySelector('#message');
       icon_message_el.style.display = "none";
 
@@ -215,6 +239,7 @@
       msg.style.display = "inherit";
       msg.style.transformBox = "fill-box";
       msg.style.transformOrigin = "center center";
+      msg.classList.add("message-clone");
       svg.appendChild(msg);
 
       anime({
@@ -241,10 +266,18 @@
     ANIMATION_ORDERS.forEach(order => {
         let startTime = order.startDelay;
         for (let i = 0; i < order.messageCount; i++) {
-            setTimeout(() => enqueueMessage(order.queueId), startTime);
+            timeoutIds.push(
+              setTimeout(() => enqueueMessage(order.queueId), startTime)
+            );
             startTime += order.messageSpacing;
         }
     });
+  }
 
+  document.addEventListener("DOMContentLoaded", () => {
+    if (autoplay) {
+      initializeAnimations();
+    }
+    playButton.addEventListener("click", resetAnimations);
     setTimeout(addTitles, 100);
   });
