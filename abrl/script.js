@@ -218,7 +218,7 @@
                     queueDuration // How long it would take to service if 0 messages in queue
                     + (messagesBeingServiced * servicingDelayMs) // How much to delay it because of queued messages
                     - lastQueuedMessageProgress; // How much to speed it up because the next message's progress already
-
+                    - 100;
       anime({
           targets: msg,
           delay: 0,
@@ -282,7 +282,7 @@
             { 
                 translateX: POSITIONS[queueId.toUpperCase() + '_START'].x, 
                 translateY: POSITIONS[queueId.toUpperCase() + '_START'].y, 
-                duration: 500
+                duration: 100
             }
         ],
         easing: "linear", 
