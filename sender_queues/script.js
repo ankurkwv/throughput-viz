@@ -75,6 +75,36 @@
       return bbox;
   };
 
+  const addTitles = () => {
+    titles.forEach(({borderId, title, subtitle}) => {
+      const borderElement = document.querySelector(`#${borderId}`);
+
+      if(!borderElement) {
+        return;
+      }
+
+      const bbox = getAugmentedBbox(borderElement, true);
+      
+      const titleDiv = document.createElement('div');
+      titleDiv.className = 'svg-title';
+      titleDiv.innerText = title;
+      titleDiv.style.left = `${bbox.x + 6}px`;
+      titleDiv.style.top = `${bbox.y - 10}px`;
+
+      document.body.appendChild(titleDiv);
+
+      if (subtitle) {
+        const subtitleDiv = document.createElement('div');
+        subtitleDiv.className = 'svg-subtitle';
+        subtitleDiv.innerText = subtitle;
+        subtitleDiv.style.right = `${bbox.xRight}px`;
+        document.body.appendChild(subtitleDiv);
+        subtitleDiv.style.top = `${bbox.yBottom - subtitleDiv.offsetHeight}px`;
+      }
+
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
 
       const svg = document.querySelector("svg");
@@ -216,32 +246,5 @@
         }
     });
 
-    titles.forEach(({borderId, title, subtitle}) => {
-      const borderElement = document.querySelector(`#${borderId}`);
-
-      if(!borderElement) {
-        return;
-      }
-
-      const bbox = getAugmentedBbox(borderElement, true);
-      
-      const titleDiv = document.createElement('div');
-      titleDiv.className = 'svg-title';
-      titleDiv.innerText = title;
-      titleDiv.style.left = `${bbox.x + 6}px`;
-      titleDiv.style.top = `${bbox.y - 12}px`;
-
-      document.body.appendChild(titleDiv);
-
-      if (subtitle) {
-        const subtitleDiv = document.createElement('div');
-        subtitleDiv.className = 'svg-subtitle';
-        subtitleDiv.innerText = subtitle;
-        subtitleDiv.style.right = `${bbox.xRight}px`;
-        document.body.appendChild(subtitleDiv);
-        subtitleDiv.style.top = `${bbox.yBottom - subtitleDiv.offsetHeight}px`;
-      }
-
-    });
-
+    setTimeout(addTitles, 100);
   });
