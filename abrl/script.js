@@ -13,18 +13,23 @@
       },
       { 
           "borderId": "path-3",
-          "title": "Blah",
-          "subtitle": "25 MPS"
+          "title": "Sender Queue 23211",
+          "subtitle": "75 MPS"
       },,
       { 
           "borderId": "path-5",
-          "title": "SUBACCOUNT 2: Sender Queue 23211",
-          "subtitle": "25 MPS"
-      },,
+          "title": "Sender Queue 55222",
+          "subtitle": "75 MPS"
+      },
       { 
           "borderId": "path-7",
-          "title": "SUBACCOUNT 3: Sender Queue 78787",
-          "subtitle": "25 MPS"
+          "title": "Sender Queue 78787",
+          "subtitle": "75 MPS"
+      },,
+      { 
+          "borderId": "path-9",
+          "title": "Account Based Rate Limit",
+          "subtitle": "75 MPS"
       },
   ];
   let POSITIONS;
@@ -37,9 +42,10 @@
   ];
 
   const QUEUE_CONFIGS = [
-      {queueId: 'queue-1', duration: 500},
-      {queueId: 'queue-2', duration: 500},
-      {queueId: 'queue-3', duration: 500},
+      {queueId: 'queue-4', duration: 250},
+      {queueId: 'queue-1', duration: 250},
+      {queueId: 'queue-2', duration: 250},
+      {queueId: 'queue-3', duration: 250},
   ];
 
   const addTitles = () => {
@@ -166,7 +172,10 @@
                     queueDuration // How long it would take to service if 0 messages in queue
                     + (messagesBeingServiced * servicingDelayMs) // How much to delay it because of queued messages
                     - lastQueuedMessageProgress; // How much to speed it up because the next message's progress already
-
+      if (queueId == 'queue-2') {
+      console.log(queueId + ': ' + queueDuration);
+      console.log('-');
+      }
       anime({
           targets: msg,
           delay: 0,
@@ -194,6 +203,49 @@
       });
     }
 
+    const serviceAbrl = (msg, toQueueId) => {
+      let queueId = 'queue-4';
+      const queueConfig = QUEUE_CONFIGS.find(config => config.queueId === queueId);
+      let queueDuration = queueConfig ? queueConfig.duration : 2000;
+      let messageId = messageIds[queueId]++;
+
+      let messageProgressArray = queueMessageProgresses[queueId];
+      let messagesBeingServiced = currentQueueMessageCounts[queueId];
+      let lastQueuedMessageProgress = messageProgressArray.slice(-1)[0] ?? 0;
+      let servicingDelayMs = 50;
+
+      queueDuration = 
+                    queueDuration // How long it would take to service if 0 messages in queue
+                    + (messagesBeingServiced * servicingDelayMs) // How much to delay it because of queued messages
+                    - lastQueuedMessageProgress; // How much to speed it up because the next message's progress already
+
+      anime({
+          targets: msg,
+          delay: 0,
+          keyframes: [
+            { 
+                translateX: POSITIONS['QUEUE-4_END'].x, 
+                translateY: POSITIONS['QUEUE-4_END'].y, 
+                duration: queueDuration
+            }
+        ],
+        easing: "linear", 
+        begin: () => {
+            // Increase the message count when a message enters the queue
+            currentQueueMessageCounts[queueId]++;
+            queueMessageProgresses[queueId][messageId] = 0;
+        },
+        complete: () => {
+            reQueueMessage(msg, toQueueId);
+            queueMessageProgresses[queueId][messageId] = 0;
+            currentQueueMessageCounts[queueId]--;
+        },
+        update: function(anim) {
+          queueMessageProgresses[queueId][messageId] = anim.currentTime;
+        },
+      });
+    }
+
     const enqueueMessage = (queueId) => {
       const msg = icon_message_el.cloneNode(true);
       msg.style.display = "inherit";
@@ -208,6 +260,25 @@
             { translateX: POSITIONS.APP.x, translateY: POSITIONS.APP.y + anime.random(-200,200), duration: 0, scale: 0 },
             { translateX: POSITIONS.APP.x, translateY: POSITIONS.APP.y, duration: 250, scale: 1 },
             { translateX: POSITIONS.TWLO.x, translateY: POSITIONS.APP.y, duration: 250 },
+            { 
+                translateX: POSITIONS['QUEUE-4_START'].x, 
+                translateY: POSITIONS['QUEUE-4_START'].y, 
+                duration: 500
+            }
+        ],
+        easing: "linear", 
+        begin: () => {
+        },
+        complete: () => {
+          serviceAbrl(msg, queueId);
+        }
+      });
+    };
+
+    const reQueueMessage = (msg, queueId) => {
+      anime({
+          targets: msg,
+          keyframes: [
             { 
                 translateX: POSITIONS[queueId.toUpperCase() + '_START'].x, 
                 translateY: POSITIONS[queueId.toUpperCase() + '_START'].y, 
