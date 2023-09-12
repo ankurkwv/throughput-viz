@@ -37,9 +37,9 @@
   ];
 
   const QUEUE_CONFIGS = [
-      {queueId: 'queue-1', duration: 500},
-      {queueId: 'queue-2', duration: 500},
-      {queueId: 'queue-3', duration: 500},
+      {queueId: 'queue-1', duration: 750},
+      {queueId: 'queue-2', duration: 750},
+      {queueId: 'queue-3', duration: 750},
   ];
 
   const addTitles = () => {
