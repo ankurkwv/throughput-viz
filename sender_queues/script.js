@@ -236,7 +236,7 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     if (autoplay) {
-      initializeAnimations();
+      setTimeout(initializeAnimations, 100);
     }
     playButton.addEventListener("click", resetAnimations);
     setTimeout(addTitles, 100);
