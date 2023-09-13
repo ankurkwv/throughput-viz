@@ -30,10 +30,10 @@
   let POSITIONS;
 
   let ANIMATION_ORDERS = [
-      {queueId: 'queue-1', startDelay: 0, messageSpacing: 10, messageCount: 30},
-      {queueId: 'queue-2', startDelay: 0, messageSpacing: 100, messageCount: 20},
-      {queueId: 'queue-1', startDelay: 2000, messageSpacing: 100, messageCount: 10},
-      {queueId: 'queue-3', startDelay: 1500, messageSpacing: 10, messageCount: 100},
+      {queueId: 'queue-1', startDelay: 0, messageSpacing: 50, messageCount: 5},
+      {queueId: 'queue-2', startDelay: 0, messageSpacing: 250, messageCount: 13},
+      {queueId: 'queue-1', startDelay: 200, messageSpacing: 150, messageCount: 10},
+      {queueId: 'queue-3', startDelay: 400, messageSpacing: 50, messageCount: 70},
   ];
 
   const QUEUE_CONFIGS = [
