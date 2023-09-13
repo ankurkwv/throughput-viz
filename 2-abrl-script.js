@@ -5,7 +5,10 @@
   let playButton = document.querySelector("#play");
   const urlParams = new URLSearchParams(window.location.search);
   const autoplay = urlParams.get('autoplay');
-
+  const MESSAGE_TYPES = [
+    'ac1-sl1', 'ac2-sl1', 'ac3-sl1',
+    'ac1-sl2', 'ac2-sl2', 'ac3-sl2'
+  ];
   let titles = [
       { 
           "borderId": "path-1",
@@ -13,19 +16,19 @@
       },
       { 
           "borderId": "path-3",
-          "title": "Sender Queue 23211",
-          "subtitle": "75 MPS"
+          "title": "SUB AC2 / Sender-Queue 55222",
+          "subtitle": "25 MPS"
       },,
       { 
           "borderId": "path-5",
-          "title": "Sender Queue 55222",
-          "subtitle": "75 MPS"
+          "title": "SUB AC1 / Sender-Queue 23211",
+          "subtitle": "25 MPS"
       },
       { 
           "borderId": "path-7",
-          "title": "Sender Queue 78787",
-          "subtitle": "75 MPS"
-      },,
+          "title": "SUB AC3 / Sender-Queue 78787",
+          "subtitle": "25 MPS"
+      },
       { 
           "borderId": "path-9",
           "title": "Account Based Rate Limit",
@@ -35,9 +38,12 @@
   let POSITIONS;
 
   let ANIMATION_ORDERS = [
-      {queueId: 'queue-1', startDelay: 0, messageSpacing: 100, messageCount: 5},
-      {queueId: 'queue-2', startDelay: 0, messageSpacing: 100, messageCount: 7},
-      {queueId: 'queue-3', startDelay: 0, messageSpacing: 100, messageCount: 30},
+      {queueId: 'queue-1', startDelay: 0, messageSpacing: 100, messageCount: 5, messageType: 'ac1-sl1', randomizeSpacing: true},
+      {queueId: 'queue-2', startDelay: 100, messageSpacing: 50, messageCount: 3, messageType: 'ac2-sl1', randomizeSpacing: true},
+      {queueId: 'queue-2', startDelay: 600, messageSpacing: 50, messageCount: 9, messageType: 'ac2-sl1', randomizeSpacing: true},
+      {queueId: 'queue-2', startDelay: 600, messageSpacing: 50, messageCount: 3, messageType: 'ac2-sl2'},
+      {queueId: 'queue-3', startDelay: 1000, messageSpacing: 10, messageCount: 30, messageType: 'ac3-sl1', randomizeSpacing: true},
+      {queueId: 'queue-3', startDelay: 200, messageSpacing: 1000, messageCount: 7, messageType: 'ac3-sl2'},
   ];
 
   const QUEUE_CONFIGS = [
@@ -124,6 +130,10 @@
           }
       };
       
+      MESSAGE_TYPES.forEach(type => {
+        document.querySelector(`#${type}`).style.display = 'none';
+      })
+
       QUEUE_CONFIGS.forEach(config => {
           const queueBbox = getAugmentedBbox(document.querySelector(`#${config.queueId}`));
           
@@ -165,16 +175,12 @@
       let messageProgressArray = queueMessageProgresses[queueId];
       let messagesBeingServiced = currentQueueMessageCounts[queueId];
       let lastQueuedMessageProgress = messageProgressArray.slice(-1)[0] ?? 0;
-      let servicingDelayMs = 75;
+      let servicingDelayMs = 10;
 
       queueDuration = 
                     queueDuration // How long it would take to service if 0 messages in queue
                     + (messagesBeingServiced * servicingDelayMs) // How much to delay it because of queued messages
-                    - lastQueuedMessageProgress; // How much to speed it up because the next message's progress already
-      if (queueId == 'queue-2') {
-      console.log(queueId + ': ' + queueDuration);
-      console.log('-');
-      }
+
       anime({
           targets: msg,
           delay: 0,
@@ -211,12 +217,11 @@
       let messageProgressArray = queueMessageProgresses[queueId];
       let messagesBeingServiced = currentQueueMessageCounts[queueId];
       let lastQueuedMessageProgress = messageProgressArray.slice(-1)[0] ?? 0;
-      let servicingDelayMs = 25;
+      let servicingDelayMs = 10;
 
       queueDuration = 
                     queueDuration // How long it would take to service if 0 messages in queue
                     + (messagesBeingServiced * servicingDelayMs) // How much to delay it because of queued messages
-                    - lastQueuedMessageProgress; // How much to speed it up because the next message's progress already
                     - 200;
       anime({
           targets: msg,
@@ -245,8 +250,8 @@
       });
     }
 
-    const enqueueMessage = (queueId) => {
-      const msg = icon_message_el.cloneNode(true);
+    const enqueueMessage = (queueId, messageType) => {
+      const msg = document.querySelector(`#${messageType}`).cloneNode(true);
       msg.style.display = "inherit";
       msg.style.transformBox = "fill-box";
       msg.style.transformOrigin = "center center";
@@ -292,16 +297,22 @@
         }
       });
     };
-
+    
     ANIMATION_ORDERS.forEach(order => {
         let startTime = order.startDelay;
+        let messageSpacing = order.messageSpacing;
         for (let i = 0; i < order.messageCount; i++) {
+            if (order.randomizeSpacing) {
+              messageSpacing = anime.random(messageSpacing - 21, messageSpacing + 21);
+            }
             timeoutIds.push(
-              setTimeout(() => enqueueMessage(order.queueId), startTime)
+              setTimeout(() => enqueueMessage(order.queueId, order.messageType), startTime)
             );
-            startTime += order.messageSpacing;
+            console.log(messageSpacing);
+            startTime += messageSpacing;
         }
     });
+
   }
 
   document.addEventListener("DOMContentLoaded", () => {
