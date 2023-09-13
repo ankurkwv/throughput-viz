@@ -3,12 +3,15 @@
   let messageIds = [];
   let timeoutIds = [];
   let playButton = document.querySelector("#play");
+
   const urlParams = new URLSearchParams(window.location.search);
   const autoplay = urlParams.get('autoplay');
+
   const MESSAGE_TYPES = [
     'ac1-sl1', 'ac2-sl1', 'ac3-sl1',
     'ac1-sl2', 'ac2-sl2', 'ac3-sl2'
   ];
+
   let titles = [
       { 
           "borderId": "path-1",
@@ -16,41 +19,23 @@
       },
       { 
           "borderId": "path-3",
-          "title": "Sender-Queue 55222",
-          "subtitle": "25 MPS"
-      },,
-      { 
-          "borderId": "path-5",
-          "title": "Sender-Queue 23211",
-          "subtitle": "25 MPS"
-      },
-      { 
-          "borderId": "path-7",
-          "title": "Sender-Queue 78787",
-          "subtitle": "25 MPS"
-      },
-      { 
-          "borderId": "path-9",
-          "title": "Account Based Rate Limit",
+          "title": "US Short Code SMS / Sender Type Market Queue",
           "subtitle": "75 MPS"
       },
   ];
   let POSITIONS;
 
   let ANIMATION_ORDERS = [
-      {queueId: 'queue-1', startDelay: 0, messageSpacing: 100, messageCount: 5, messageType: 'ac1-sl1', randomizeSpacing: true},
-      {queueId: 'queue-2', startDelay: 100, messageSpacing: 50, messageCount: 3, messageType: 'ac2-sl1', randomizeSpacing: true},
-      {queueId: 'queue-2', startDelay: 600, messageSpacing: 50, messageCount: 9, messageType: 'ac2-sl1', randomizeSpacing: true},
-      {queueId: 'queue-2', startDelay: 600, messageSpacing: 50, messageCount: 3, messageType: 'ac2-sl2'},
-      {queueId: 'queue-3', startDelay: 1000, messageSpacing: 10, messageCount: 30, messageType: 'ac3-sl1', randomizeSpacing: true},
-      {queueId: 'queue-3', startDelay: 200, messageSpacing: 1000, messageCount: 7, messageType: 'ac3-sl2'},
+      {queueId: 'queue-4', startDelay: 0, messageSpacing: 100, messageCount: 5, messageType: 'ac1-sl1', randomizeSpacing: true},
+      {queueId: 'queue-4', startDelay: 100, messageSpacing: 50, messageCount: 3, messageType: 'ac2-sl1', randomizeSpacing: true},
+      {queueId: 'queue-4', startDelay: 600, messageSpacing: 50, messageCount: 9, messageType: 'ac2-sl1', randomizeSpacing: true},
+      {queueId: 'queue-4', startDelay: 600, messageSpacing: 50, messageCount: 3, messageType: 'ac2-sl2'},
+      {queueId: 'queue-4', startDelay: 1000, messageSpacing: 10, messageCount: 30, messageType: 'ac3-sl1', randomizeSpacing: true},
+      {queueId: 'queue-4', startDelay: 200, messageSpacing: 1000, messageCount: 7, messageType: 'ac3-sl2'},
   ];
 
   const QUEUE_CONFIGS = [
-      {queueId: 'queue-4', duration: 1000},
-      {queueId: 'queue-1', duration: 1000},
-      {queueId: 'queue-2', duration: 1000},
-      {queueId: 'queue-3', duration: 1000},
+      {queueId: 'queue-4', duration: 2000},
   ];
 
   const addTitles = () => {
@@ -180,6 +165,7 @@
       queueDuration = 
                     queueDuration // How long it would take to service if 0 messages in queue
                     + (messagesBeingServiced * servicingDelayMs) // How much to delay it because of queued messages
+                    // - lastQueuedMessageProgress; // How much to speed it up because the next message's progress already
 
       anime({
           targets: msg,
@@ -208,48 +194,6 @@
       });
     }
 
-    const serviceAbrl = (msg, toQueueId) => {
-      let queueId = 'queue-4';
-      const queueConfig = QUEUE_CONFIGS.find(config => config.queueId === queueId);
-      let queueDuration = queueConfig ? queueConfig.duration : 2000;
-      let messageId = messageIds[queueId]++;
-
-      let messageProgressArray = queueMessageProgresses[queueId];
-      let messagesBeingServiced = currentQueueMessageCounts[queueId];
-      let lastQueuedMessageProgress = messageProgressArray.slice(-1)[0] ?? 0;
-      let servicingDelayMs = 10;
-
-      queueDuration = 
-                    queueDuration // How long it would take to service if 0 messages in queue
-                    + (messagesBeingServiced * servicingDelayMs) // How much to delay it because of queued messages
-                    - 200;
-      anime({
-          targets: msg,
-          delay: 0,
-          keyframes: [
-            { 
-                translateX: POSITIONS['QUEUE-4_END'].x, 
-                translateY: POSITIONS['QUEUE-4_END'].y, 
-                duration: queueDuration
-            }
-        ],
-        easing: "linear", 
-        begin: () => {
-            // Increase the message count when a message enters the queue
-            currentQueueMessageCounts[queueId]++;
-            queueMessageProgresses[queueId][messageId] = 0;
-        },
-        complete: () => {
-            reQueueMessage(msg, toQueueId);
-            queueMessageProgresses[queueId][messageId] = 0;
-            currentQueueMessageCounts[queueId]--;
-        },
-        update: function(anim) {
-          queueMessageProgresses[queueId][messageId] = anim.currentTime;
-        },
-      });
-    }
-
     const enqueueMessage = (queueId, messageType) => {
       const msg = document.querySelector(`#${messageType}`).cloneNode(true);
       msg.style.display = "inherit";
@@ -265,28 +209,9 @@
             { translateX: POSITIONS.APP.x, translateY: POSITIONS.APP.y, duration: 250, scale: 1 },
             { translateX: POSITIONS.TWLO.x, translateY: POSITIONS.APP.y, duration: 250 },
             { 
-                translateX: POSITIONS['QUEUE-4_START'].x, 
-                translateY: POSITIONS['QUEUE-4_START'].y, 
-                duration: 250
-            }
-        ],
-        easing: "linear", 
-        begin: () => {
-        },
-        complete: () => {
-          serviceAbrl(msg, queueId);
-        }
-      });
-    };
-
-    const reQueueMessage = (msg, queueId) => {
-      anime({
-          targets: msg,
-          keyframes: [
-            { 
                 translateX: POSITIONS[queueId.toUpperCase() + '_START'].x, 
                 translateY: POSITIONS[queueId.toUpperCase() + '_START'].y, 
-                duration: 250
+                duration: 500
             }
         ],
         easing: "linear", 
@@ -312,7 +237,6 @@
             startTime += messageSpacing;
         }
     });
-
   }
 
   document.addEventListener("DOMContentLoaded", () => {
