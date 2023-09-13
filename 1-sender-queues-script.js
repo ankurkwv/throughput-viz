@@ -13,39 +13,32 @@
       },
       { 
           "borderId": "path-3",
-          "title": "Sender Queue 23211",
-          "subtitle": "75 MPS"
+          "title": "Blah",
+          "subtitle": "25 MPS"
       },,
       { 
           "borderId": "path-5",
-          "title": "Sender Queue 55222",
-          "subtitle": "75 MPS"
-      },
-      { 
-          "borderId": "path-7",
-          "title": "Sender Queue 78787",
-          "subtitle": "75 MPS"
+          "title": "SUBACCOUNT 2: Sender Queue 23211",
+          "subtitle": "25 MPS"
       },,
       { 
-          "borderId": "path-9",
-          "title": "Account Based Rate Limit",
-          "subtitle": "75 MPS"
+          "borderId": "path-7",
+          "title": "SUBACCOUNT 3: Sender Queue 78787",
+          "subtitle": "25 MPS"
       },
   ];
   let POSITIONS;
 
   let ANIMATION_ORDERS = [
-      {queueId: 'queue-1', startDelay: 0, messageSpacing: 50, messageCount: 5},
-      {queueId: 'queue-2', startDelay: 0, messageSpacing: 250, messageCount: 13},
-      {queueId: 'queue-1', startDelay: 200, messageSpacing: 150, messageCount: 10},
-      {queueId: 'queue-3', startDelay: 400, messageSpacing: 50, messageCount: 70},
+      {queueId: 'queue-1', startDelay: 0, messageSpacing: 100, messageCount: 5},
+      {queueId: 'queue-2', startDelay: 0, messageSpacing: 100, messageCount: 7},
+      {queueId: 'queue-3', startDelay: 0, messageSpacing: 100, messageCount: 30},
   ];
 
   const QUEUE_CONFIGS = [
-      {queueId: 'queue-4', duration: 250},
-      {queueId: 'queue-1', duration: 250},
-      {queueId: 'queue-2', duration: 250},
-      {queueId: 'queue-3', duration: 250},
+      {queueId: 'queue-1', duration: 5000},
+      {queueId: 'queue-2', duration: 5000},
+      {queueId: 'queue-3', duration: 5000},
   ];
 
   const addTitles = () => {
@@ -99,7 +92,7 @@
   };
 
   const initializeAnimations = () => {
-    playButton.innerText = 'Restart'
+    playButton.innerText = 'Restart Animation'
     const svg = document.querySelector("svg");
       const icon_message_el = document.querySelector('#message');
       icon_message_el.style.display = "none";
@@ -172,10 +165,7 @@
                     queueDuration // How long it would take to service if 0 messages in queue
                     + (messagesBeingServiced * servicingDelayMs) // How much to delay it because of queued messages
                     - lastQueuedMessageProgress; // How much to speed it up because the next message's progress already
-      if (queueId == 'queue-2') {
-      console.log(queueId + ': ' + queueDuration);
-      console.log('-');
-      }
+
       anime({
           targets: msg,
           delay: 0,
@@ -203,49 +193,6 @@
       });
     }
 
-    const serviceAbrl = (msg, toQueueId) => {
-      let queueId = 'queue-4';
-      const queueConfig = QUEUE_CONFIGS.find(config => config.queueId === queueId);
-      let queueDuration = queueConfig ? queueConfig.duration : 2000;
-      let messageId = messageIds[queueId]++;
-
-      let messageProgressArray = queueMessageProgresses[queueId];
-      let messagesBeingServiced = currentQueueMessageCounts[queueId];
-      let lastQueuedMessageProgress = messageProgressArray.slice(-1)[0] ?? 0;
-      let servicingDelayMs = 25;
-
-      queueDuration = 
-                    queueDuration // How long it would take to service if 0 messages in queue
-                    + (messagesBeingServiced * servicingDelayMs) // How much to delay it because of queued messages
-                    - lastQueuedMessageProgress; // How much to speed it up because the next message's progress already
-                    - 200;
-      anime({
-          targets: msg,
-          delay: 0,
-          keyframes: [
-            { 
-                translateX: POSITIONS['QUEUE-4_END'].x, 
-                translateY: POSITIONS['QUEUE-4_END'].y, 
-                duration: queueDuration
-            }
-        ],
-        easing: "linear", 
-        begin: () => {
-            // Increase the message count when a message enters the queue
-            currentQueueMessageCounts[queueId]++;
-            queueMessageProgresses[queueId][messageId] = 0;
-        },
-        complete: () => {
-            reQueueMessage(msg, toQueueId);
-            queueMessageProgresses[queueId][messageId] = 0;
-            currentQueueMessageCounts[queueId]--;
-        },
-        update: function(anim) {
-          queueMessageProgresses[queueId][messageId] = anim.currentTime;
-        },
-      });
-    }
-
     const enqueueMessage = (queueId) => {
       const msg = icon_message_el.cloneNode(true);
       msg.style.display = "inherit";
@@ -261,28 +208,9 @@
             { translateX: POSITIONS.APP.x, translateY: POSITIONS.APP.y, duration: 250, scale: 1 },
             { translateX: POSITIONS.TWLO.x, translateY: POSITIONS.APP.y, duration: 250 },
             { 
-                translateX: POSITIONS['QUEUE-4_START'].x, 
-                translateY: POSITIONS['QUEUE-4_START'].y, 
-                duration: 150
-            }
-        ],
-        easing: "linear", 
-        begin: () => {
-        },
-        complete: () => {
-          serviceAbrl(msg, queueId);
-        }
-      });
-    };
-
-    const reQueueMessage = (msg, queueId) => {
-      anime({
-          targets: msg,
-          keyframes: [
-            { 
                 translateX: POSITIONS[queueId.toUpperCase() + '_START'].x, 
                 translateY: POSITIONS[queueId.toUpperCase() + '_START'].y, 
-                duration: 150
+                duration: 500
             }
         ],
         easing: "linear", 
