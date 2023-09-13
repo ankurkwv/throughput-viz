@@ -64,7 +64,7 @@
       titleDiv.className = 'svg-title';
       titleDiv.innerText = title;
       titleDiv.style.left = `${bbox.x + 6}px`;
-      titleDiv.style.top = `${bbox.y - 10}px`;
+      titleDiv.style.top = `${bbox.y - 14}px`;
 
       document.body.appendChild(titleDiv);
 
