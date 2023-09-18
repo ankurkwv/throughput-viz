@@ -14,28 +14,23 @@
 
   let titles = [
       { 
-          "borderId": "path-1",
-          "title": "YOUR PARENT ACCOUNT",
-      },
-      { 
           "borderId": "path-3",
-          "title": "US Short Code SMS / Sender Type Market Queue",
+          "title": "PARENT AC + US-ATT + SHORT CODE SMS QUEUE",
           "subtitle": "75 MPS"
       },
   ];
   let POSITIONS;
 
   let ANIMATION_ORDERS = [
-      {queueId: 'queue-4', startDelay: 0, messageSpacing: 100, messageCount: 5, messageType: 'ac1-sl1', randomizeSpacing: true},
-      {queueId: 'queue-4', startDelay: 100, messageSpacing: 50, messageCount: 3, messageType: 'ac2-sl1', randomizeSpacing: true},
-      {queueId: 'queue-4', startDelay: 600, messageSpacing: 50, messageCount: 9, messageType: 'ac2-sl1', randomizeSpacing: true},
-      {queueId: 'queue-4', startDelay: 600, messageSpacing: 50, messageCount: 3, messageType: 'ac2-sl2'},
-      {queueId: 'queue-4', startDelay: 1000, messageSpacing: 10, messageCount: 30, messageType: 'ac3-sl1', randomizeSpacing: true},
-      {queueId: 'queue-4', startDelay: 200, messageSpacing: 1000, messageCount: 7, messageType: 'ac3-sl2'},
+      {queueId: 'queue-4', startDelay: 0, messageSpacing: 500, messageCount: 10, messageType: 'ac1-sl1'},
+      {queueId: 'queue-4', startDelay: 100, messageSpacing: 600, messageCount: 10, messageType: 'ac2-sl1'},
+      {queueId: 'queue-4', startDelay: 200, messageSpacing: 750, messageCount: 10, messageType: 'ac3-sl1'},
+      {queueId: 'queue-4', startDelay: 0, messageSpacing: 550, messageCount: 15, messageType: 'ac2-sl2'},
+      {queueId: 'queue-4', startDelay: 200, messageSpacing: 1000, messageCount: 6, messageType: 'ac3-sl2'},
   ];
 
   const QUEUE_CONFIGS = [
-      {queueId: 'queue-4', duration: 2000},
+      {queueId: 'queue-4', duration: 4000},
   ];
 
   const addTitles = () => {
