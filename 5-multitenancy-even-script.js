@@ -17,32 +17,38 @@
           "subtitle": TOTAL_MPS + " MPS TOTAL"
       },
       { 
-          "borderId": "sl-1",
-          "title": "Important (Traffic Shaping Service Level 1)",
-          "subtitle": "[<span id='sl-1-rate'>0.00</span>/" + TOTAL_MPS + " MPS]"
+          "borderId": "sub-1",
+          "title": "Subaccount 1 (AC1)",
+          "subtitle": "[<span id='sub-1-rate'>0.00</span>/" + TOTAL_MPS + " MPS]"
       },
       { 
-          "borderId": "sl-2",
-          "title": "Regular (Traffic Shaping Service Level 2)",
-          "subtitle": "[<span id='sl-2-rate'>0.00</span>/" + TOTAL_MPS + " MPS]"
+          "borderId": "sub-2",
+          "title": "Subaccount 2 (AC2)",
+          "subtitle": "[<span id='sub-2-rate'>0.00</span>/" + TOTAL_MPS + " MPS]"
+      },
+      { 
+          "borderId": "sub-3",
+          "title": "Subaccount 3 (AC3)",
+          "subtitle": "[<span id='sub-3-rate'>0.00</span>/" + TOTAL_MPS + " MPS]"
       },
   ];
   let POSITIONS;
 
   let ANIMATION_ORDERS = [
-      {queueId: 'sl-2', startDelay: 0, messageSpacing: 500, messageCount: 10, messageType: 'ac1-sl1'},
-      {queueId: 'sl-2', startDelay: 100, messageSpacing: 600, messageCount: 10, messageType: 'ac2-sl1'},
-      {queueId: 'sl-2', startDelay: 200, messageSpacing: 100, messageCount: 60, messageType: 'ac3-sl1'},
-      {queueId: 'sl-1', startDelay: 1400, messageSpacing: 400, messageCount: 2, messageType: 'ac2-sl2'},
-      {queueId: 'sl-1', startDelay: 1600, messageSpacing: 100, messageCount: 5, messageType: 'ac3-sl2'},
-      {queueId: 'sl-1', startDelay: 6400, messageSpacing: 200, messageCount: 6, messageType: 'ac2-sl2'},
-      {queueId: 'sl-1', startDelay: 6600, messageSpacing: 300, messageCount: 3, messageType: 'ac3-sl2'},
+      {queueId: 'sub-1', startDelay: 0, messageSpacing: 500, messageCount: 5, messageType: 'ac1-sl1'},
+      {queueId: 'sub-2', startDelay: 100, messageSpacing: 600, messageCount: 10, messageType: 'ac2-sl1'},
+      {queueId: 'sub-3', startDelay: 200, messageSpacing: 100, messageCount: 60, messageType: 'ac3-sl1'},
+      {queueId: 'sub-2', startDelay: 1400, messageSpacing: 400, messageCount: 2, messageType: 'ac2-sl2'},
+      {queueId: 'sub-3', startDelay: 1600, messageSpacing: 100, messageCount: 5, messageType: 'ac3-sl2'},
+      {queueId: 'sub-2', startDelay: 6400, messageSpacing: 200, messageCount: 4, messageType: 'ac2-sl2'},
+      {queueId: 'sub-3', startDelay: 6600, messageSpacing: 300, messageCount: 3, messageType: 'ac3-sl2'},
   ];
 
   const DEFAULT_QUEUE_DURATION = 200;
   let QUEUE_CONFIGS = {
-      'sl-1': {queueId: 'sl-1', duration: DEFAULT_QUEUE_DURATION , steps: 6, weight: 50},
-      'sl-2': {queueId: 'sl-2', duration: DEFAULT_QUEUE_DURATION , steps: 6, weight: 20},
+      'sub-1': {queueId: 'sub-1', duration: DEFAULT_QUEUE_DURATION , steps: 6, weight: 1},
+      'sub-2': {queueId: 'sub-2', duration: DEFAULT_QUEUE_DURATION , steps: 6, weight: 1},
+      'sub-3': {queueId: 'sub-3', duration: DEFAULT_QUEUE_DURATION , steps: 6, weight: 1},
   };
 
   const createDiv = (className, text, style) => {
