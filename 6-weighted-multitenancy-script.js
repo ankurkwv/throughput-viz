@@ -12,43 +12,52 @@
   const MPS_TO_DURATION_MS = 60;
   let titles = [
       { 
-          "borderId": "path-1",
-          "title": "US-ATT SHORT CODE SMS QUEUES",
-          "subtitle": TOTAL_MPS + " MPS TOTAL"
+          "borderId": "parent-queue",
+          "title": "US-ATT SHORT CODE SMS QUEUES <span class='mps'>TOTAL [" + TOTAL_MPS + " MPS]</span>",
+      },
+      { 
+          "borderId": "tier-1",
+          "title": "Tier 1 <span class='mps'>80% weight [<span class='tier-1-rate'>0.00</span>/" + TOTAL_MPS + " MPS]</span>"
+      },
+      { 
+          "borderId": "tier-2",
+          "title": "Tier 2 <span class='mps'>20% weight [<span class='tier-2-rate'>0.00</span>/" + TOTAL_MPS + " MPS]</span>"
       },
       { 
           "borderId": "sub-1",
-          "title": "Subaccount 1 (AC1)",
-          "subtitle": "[<span id='sub-1-rate'>0.00</span>/" + TOTAL_MPS + " MPS]"
+          "subtitle": "Subaccount 1 <span class='mps'>tier split [<span id='sub-1-rate'>0.00</span> MPS]</span>"
       },
       { 
           "borderId": "sub-2",
-          "title": "Subaccount 2 (AC2)",
-          "subtitle": "[<span id='sub-2-rate'>0.00</span>/" + TOTAL_MPS + " MPS]"
+          "subtitle": "Subaccount 2 <span class='mps'>tier split [<span id='sub-2-rate'>0.00</span> MPS]</span>"
       },
       { 
           "borderId": "sub-3",
-          "title": "Subaccount 3 (AC3)",
-          "subtitle": "[<span id='sub-3-rate'>0.00</span>/" + TOTAL_MPS + " MPS]"
+          "subtitle": "Subaccount 3 <span class='mps'>tier split [<span id='sub-3-rate'>0.00</span> MPS]</span>"
       },
   ];
   let POSITIONS;
 
   let ANIMATION_ORDERS = [
-      {queueId: 'sub-1', startDelay: 0, messageSpacing: 500, messageCount: 5, messageType: 'ac1-sl1'},
-      {queueId: 'sub-2', startDelay: 100, messageSpacing: 600, messageCount: 10, messageType: 'ac2-sl1'},
-      {queueId: 'sub-3', startDelay: 200, messageSpacing: 100, messageCount: 60, messageType: 'ac3-sl1'},
-      {queueId: 'sub-2', startDelay: 1400, messageSpacing: 400, messageCount: 2, messageType: 'ac2-sl2'},
-      {queueId: 'sub-3', startDelay: 1600, messageSpacing: 100, messageCount: 5, messageType: 'ac3-sl2'},
-      {queueId: 'sub-2', startDelay: 6400, messageSpacing: 200, messageCount: 4, messageType: 'ac2-sl2'},
-      {queueId: 'sub-3', startDelay: 6600, messageSpacing: 300, messageCount: 3, messageType: 'ac3-sl2'},
+      {queueId: 'sub-2', startDelay: 0, messageSpacing: 500, messageCount: 5, messageType: 'ac1-sl1'},
+      {queueId: 'sub-3', startDelay: 100, messageSpacing: 600, messageCount: 2, messageType: 'ac2-sl1'},
+      {queueId: 'sub-1', startDelay: 200, messageSpacing: 100, messageCount: 60, messageType: 'ac3-sl1'},
+      {queueId: 'sub-3', startDelay: 1400, messageSpacing: 400, messageCount: 2, messageType: 'ac2-sl2'},
+      {queueId: 'sub-1', startDelay: 1600, messageSpacing: 100, messageCount: 5, messageType: 'ac3-sl2'},
+      {queueId: 'sub-3', startDelay: 6400, messageSpacing: 200, messageCount: 2, messageType: 'ac2-sl2'},
+      {queueId: 'sub-3', startDelay: 1600, messageSpacing: 300, messageCount: 5, messageType: 'ac3-sl2'},
   ];
 
   const DEFAULT_QUEUE_DURATION = 200;
+  let TIERS = {
+    'tier-1': {weight: 8, subs: ['sub-3']},
+    'tier-2': {weight: 2, subs: ['sub-1', 'sub-2']},
+  };
+
   let QUEUE_CONFIGS = {
-      'sub-1': {queueId: 'sub-1', duration: DEFAULT_QUEUE_DURATION , steps: 6, weight: 1},
-      'sub-2': {queueId: 'sub-2', duration: DEFAULT_QUEUE_DURATION , steps: 6, weight: 1},
-      'sub-3': {queueId: 'sub-3', duration: DEFAULT_QUEUE_DURATION , steps: 6, weight: 1},
+      'sub-1': {queueId: 'sub-1', duration: DEFAULT_QUEUE_DURATION, steps: 6, weight: 1, tier: 'tier-2'},
+      'sub-2': {queueId: 'sub-2', duration: DEFAULT_QUEUE_DURATION, steps: 6, weight: 1, tier: 'tier-2'},
+      'sub-3': {queueId: 'sub-3', duration: DEFAULT_QUEUE_DURATION, steps: 6, weight: 1, tier: 'tier-1'},
   };
 
   const createDiv = (className, text, style) => {
@@ -66,11 +75,13 @@
       if(!borderElement) return;
 
       const bbox = getAugmentedBbox(borderElement, true);
-      const titleDiv = createDiv('svg-title', title, { left: `${bbox.x + 6}px`, top: `${bbox.y - 14}px` });
+      if (title) {
+        const titleDiv = createDiv('svg-title', title, { left: `${bbox.x + 6}px`, top: `${bbox.y - 14}px` });
+      }
 
       if (subtitle) {
-        const subtitleDiv = createDiv('svg-subtitle', subtitle, { right: `${bbox.xRight}px`});
-        subtitleDiv.style.top = `${bbox.yBottom - subtitleDiv.offsetHeight}px`;
+        const subtitleDiv = createDiv('svg-subtitle', subtitle, { right: `${bbox.xRight - 2}px`});
+        subtitleDiv.style.top = `${bbox.yBottom - subtitleDiv.offsetHeight + 2}px`;
       }
     });
   };
@@ -182,18 +193,51 @@
     }
 
     let lastDurations = {};
+    let lastRates = {};
+
     const shape = () => {
+      // console.clear();
       let rates = {};
       let durations = {};
 
       let totalWeight = 0;
+      let totalTierWeight = 0;
       let queueOn = 0;
-      for (const queueId of Object.keys(QUEUE_CONFIGS)) {
-          totalWeight += currentQueueMessageCounts[queueId] > 0 ? QUEUE_CONFIGS[queueId].weight : 0;
+      let tierWeights = {};
+      let tierMessages = {};
+      let tierActiveSubs = {};
+      let tierOn = 0;
+
+      for (const tierId of Object.keys(TIERS)) {
+        tierMessages[tierId] = 0;
+        tierActiveSubs[tierId] = [];
+        TIERS[tierId].subs.forEach(subQueueId => {
+          tierMessages[tierId] += currentQueueMessageCounts[subQueueId];
+          if (currentQueueMessageCounts[subQueueId] > 0) {
+            tierActiveSubs[tierId].push(subQueueId);
+          }
+        });
+        totalTierWeight += tierMessages[tierId] > 0 ? TIERS[tierId].weight : 0;
+      }
+
+      for (const tierId of Object.keys(TIERS)) {
+        tierOn = (tierMessages[tierId] > 0) ? 1 : 0;
+        rates[tierId] = tierOn * TIERS[tierId].weight / totalTierWeight * TOTAL_MPS;
+        rates[tierId] = isNaN(rates[tierId]) ? 0 : rates[tierId];
+        if (rates[tierId] !== lastRates[tierId]) {
+            flashRectangle(document.querySelector(`#${tierId}`));
         }
+        lastRates = {...rates};
+        document.querySelectorAll(`.${tierId}-rate`).forEach(el => el.innerText = rates[tierId].toFixed(2));
+      }
+
       for (const queueId of Object.keys(QUEUE_CONFIGS)) { 
-          queueOn = (currentQueueMessageCounts[queueId] > 0) ? 1 : 0;
-          rates[queueId] = (totalWeight === 0) ? 0 : (queueOn * QUEUE_CONFIGS[queueId].weight / totalWeight) * TOTAL_MPS;
+        let queueTierId = QUEUE_CONFIGS[queueId].tier;
+        let tierRate = rates[queueTierId];
+        let tierActiveSubsCount = tierActiveSubs[queueTierId].length;
+        queueOn = (currentQueueMessageCounts[queueId] > 0) ? 1 : 0;
+        rates[queueId] = (queueOn / tierActiveSubsCount) * tierRate;
+        rates[queueId] = isNaN(rates[queueId]) ? 0 : rates[queueId];
           durations[queueId] = rates[queueId] === 0 ? DEFAULT_QUEUE_DURATION : Math.ceil(1 / rates[queueId] * (DEFAULT_QUEUE_DURATION * MPS_TO_DURATION_MS));
 
           document.querySelector(`#${queueId}-rate`).innerText = rates[queueId].toFixed(2);
@@ -242,8 +286,6 @@
               currentQueueMessageCounts[queueId]--;
             }
             else {
-              console.log(step+1);
-              console.log(queueConfig.steps);
               serviceMessage(msg, queueId, step + 1);
             }
             shape();
@@ -296,16 +338,16 @@
   }
 
   const pulsePlay = () => {
-    anime({
-      targets: '#play',
-      scale: [1, 1.1, 1],
-      backgroundColor: ['rgb(22 27 36)', 'rgb(255, 255, 179)', 'rgb(22 27 36)'], // Alternates between two colors
-      boxShadow: ['0px 0px 0px 0px rgba(255, 255, 179, 0)', '0px 0px 5px 5px rgba(255, 255, 179, .3)', '0px 0px 0px 0px rgba(255, 255, 179, 0)'], // Increases the box-shadow
-      duration: 500,
-      loop: true,
-      easing: 'easeInOutSine',
-      endDelay: 5000,
-    });
+    // anime({
+    //   targets: '#play',
+    //   scale: [1, 1.1, 1],
+    //   backgroundColor: ['rgb(22 27 36)', 'rgb(255, 255, 179)', 'rgb(22 27 36)'], // Alternates between two colors
+    //   boxShadow: ['0px 0px 0px 0px rgba(255, 255, 179, 0)', '0px 0px 5px 5px rgba(255, 255, 179, .3)', '0px 0px 0px 0px rgba(255, 255, 179, 0)'], // Increases the box-shadow
+    //   duration: 500,
+    //   loop: true,
+    //   easing: 'easeInOutSine',
+    //   endDelay: 5000,
+    // });
   }
 
   document.addEventListener("DOMContentLoaded", () => {
