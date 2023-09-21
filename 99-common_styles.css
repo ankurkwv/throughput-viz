@@ -52,3 +52,31 @@ body {
 .menu button:last-of-type {
     margin-right: 0;
 }
+
+
+.svg-title, .svg-subtitle {
+    position: absolute;
+    background-color: #0E0E0E;
+    padding: 1px 3px;
+    font-family: 'Arial Black', sans-serif;
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: #FFFFFF;
+    text-transform: uppercase;
+}
+
+.svg-title .mps, .svg-subtitle .mps {
+    color: #54392C;
+    background: #FFC7AD;
+    font-size: 8px;
+    padding: 3px 8px;
+    border-radius: 4px;
+
+}
+
+.svg-subtitle {
+  font-size: 8px;
+  background: transparent;
+  color: #0e0e0e;
+  font-family: 'Arial Black', sans-serif;
+}

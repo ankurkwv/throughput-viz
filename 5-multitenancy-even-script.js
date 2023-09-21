@@ -13,23 +13,22 @@
   let titles = [
       { 
           "borderId": "path-1",
-          "title": "US-ATT SHORT CODE SMS QUEUE",
-          "subtitle": TOTAL_MPS + " MPS TOTAL"
+          "title": "US-ATT SHORT CODE SMS QUEUE <span class='mps'>TOTAL [" + TOTAL_MPS + " MPS]</span>",
       },
       { 
           "borderId": "sub-1",
           "title": "Subaccount 1 (AC1)",
-          "subtitle": "[<span id='sub-1-rate'>0.00</span>/" + TOTAL_MPS + " MPS]"
+          "subtitle": "<span class='mps'><span id='sub-1-rate'>0.00</span> MPS</span>"
       },
       { 
           "borderId": "sub-2",
           "title": "Subaccount 2 (AC2)",
-          "subtitle": "[<span id='sub-2-rate'>0.00</span>/" + TOTAL_MPS + " MPS]"
+          "subtitle": "<span class='mps'><span id='sub-2-rate'>0.00</span> MPS</span>"
       },
       { 
           "borderId": "sub-3",
           "title": "Subaccount 3 (AC3)",
-          "subtitle": "[<span id='sub-3-rate'>0.00</span>/" + TOTAL_MPS + " MPS]"
+          "subtitle": "<span class='mps'><span id='sub-3-rate'>0.00</span> MPS</span>"
       },
   ];
   let POSITIONS;
@@ -169,19 +168,35 @@
       });
     }
 
+    let flashingSet = new Set();
     const flashRectangle = (rectangle) => {
+      if (flashingSet.has(rectangle)) return;
+      flashingSet.add(rectangle);
+      let backgroundOg = getComputedStyle(rectangle).backgroundColor;
       anime({
         targets: rectangle,
-        fill: [
+        backgroundColor: [
           { value: '#FFFFB3', duration: 200, easing: 'easeOutSine' },
-          { value: '#D8D8D8', duration: 200, easing: 'easeInSine' }
+          { value: backgroundOg, duration:200, easing: 'easeInSine' }
         ],
         delay: anime.stagger(100),
-        loop: false
+        loop: false,
+        begin: () => {
+        },
+        complete: () => {
+          flashingSet.delete(rectangle);
+        }
       });
     }
 
-    let lastDurations = {};
+    let pastRates = {};
+    const comparePastRates = (id, elms, currentRates) => {
+      if (pastRates[id] !== currentRates[id]) {
+        elms.forEach(el => flashRectangle(el));
+      }
+      pastRates[id] = currentRates[id]; 
+    }
+
     const shape = () => {
       let rates = {};
       let durations = {};
@@ -195,13 +210,10 @@
           queueOn = (currentQueueMessageCounts[queueId] > 0) ? 1 : 0;
           rates[queueId] = (totalWeight === 0) ? 0 : (queueOn * QUEUE_CONFIGS[queueId].weight / totalWeight) * TOTAL_MPS;
           durations[queueId] = rates[queueId] === 0 ? DEFAULT_QUEUE_DURATION : Math.ceil(1 / rates[queueId] * (DEFAULT_QUEUE_DURATION * MPS_TO_DURATION_MS));
-
-          document.querySelector(`#${queueId}-rate`).innerText = rates[queueId].toFixed(2);
+          let queueRateElms = document.querySelectorAll(`#${queueId}-rate`);
+          comparePastRates(queueId, queueRateElms, rates);
+          queueRateElms.forEach(el => el.innerText = rates[queueId].toFixed(2));
           QUEUE_CONFIGS[queueId].duration = durations[queueId];
-
-          if (durations[queueId] !== lastDurations[queueId]) {
-              flashRectangle(document.querySelector(`#${queueId}`));
-          }
       }
 
       lastDurations = {...durations};

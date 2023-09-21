@@ -17,22 +17,22 @@
       { 
           "borderId": "path-3",
           "title": "Sender-Queue 55222",
-          "subtitle": "75 MPS"
+          "subtitle": "<span class='mps'>75 MPS</span>"
       },,
       { 
           "borderId": "path-5",
           "title": "Sender-Queue 23211",
-          "subtitle": "75 MPS"
+          "subtitle": "<span class='mps'>75 MPS</span>"
       },
       { 
           "borderId": "path-7",
           "title": "Sender-Queue 78787",
-          "subtitle": "75 MPS"
+          "subtitle": "<span class='mps'>75 MPS</span>"
       },
       { 
           "borderId": "path-9",
           "title": "Account Based Rate Limit",
-          "subtitle": "75 MPS"
+          "subtitle": "<span class='mps'>75 MPS</span>"
       },
   ];
   let POSITIONS;
@@ -74,7 +74,7 @@
       if (subtitle) {
         const subtitleDiv = document.createElement('div');
         subtitleDiv.className = 'svg-subtitle';
-        subtitleDiv.innerText = subtitle;
+        subtitleDiv.innerHTML = subtitle;
         subtitleDiv.style.right = `${bbox.xRight}px`;
         document.body.appendChild(subtitleDiv);
         subtitleDiv.style.top = `${bbox.yBottom - subtitleDiv.offsetHeight}px`;

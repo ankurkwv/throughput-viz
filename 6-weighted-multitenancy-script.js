@@ -25,15 +25,15 @@
       },
       { 
           "borderId": "sub-1",
-          "subtitle": "Subaccount 1 <span class='mps'>tier split [<span id='sub-1-rate'>0.00</span> MPS]</span>"
+          "subtitle": "Subaccount 1 <span class='mps'><span id='sub-1-rate'>0.00</span> MPS</span>"
       },
       { 
           "borderId": "sub-2",
-          "subtitle": "Subaccount 2 <span class='mps'>tier split [<span id='sub-2-rate'>0.00</span> MPS]</span>"
+          "subtitle": "Subaccount 2 <span class='mps'><span id='sub-2-rate'>0.00</span> MPS</span>"
       },
       { 
           "borderId": "sub-3",
-          "subtitle": "Subaccount 3 <span class='mps'>tier split [<span id='sub-3-rate'>0.00</span> MPS]</span>"
+          "subtitle": "Subaccount 3 <span class='mps'><span id='sub-3-rate'>0.00</span> MPS</span>"
       },
   ];
   let POSITIONS;
@@ -180,16 +180,33 @@
       });
     }
 
+    let flashingSet = new Set();
     const flashRectangle = (rectangle) => {
+      if (flashingSet.has(rectangle)) return;
+      flashingSet.add(rectangle);
+      let backgroundOg = getComputedStyle(rectangle).backgroundColor;
       anime({
         targets: rectangle,
-        fill: [
+        backgroundColor: [
           { value: '#FFFFB3', duration: 200, easing: 'easeOutSine' },
-          { value: '#D8D8D8', duration: 200, easing: 'easeInSine' }
+          { value: backgroundOg, duration:200, easing: 'easeInSine' }
         ],
         delay: anime.stagger(100),
-        loop: false
+        loop: false,
+        begin: () => {
+        },
+        complete: () => {
+          flashingSet.delete(rectangle);
+        }
       });
+    }
+
+    let pastRates = {};
+    const comparePastRates = (id, elms, currentRates) => {
+      if (pastRates[id] !== currentRates[id]) {
+        elms.forEach(el => flashRectangle(el));
+      }
+      pastRates[id] = currentRates[id]; 
     }
 
     let lastDurations = {};
@@ -224,11 +241,10 @@
         tierOn = (tierMessages[tierId] > 0) ? 1 : 0;
         rates[tierId] = tierOn * TIERS[tierId].weight / totalTierWeight * TOTAL_MPS;
         rates[tierId] = isNaN(rates[tierId]) ? 0 : rates[tierId];
-        if (rates[tierId] !== lastRates[tierId]) {
-            flashRectangle(document.querySelector(`#${tierId}`));
-        }
+        let rateElms = document.querySelectorAll(`.${tierId}-rate`);
+        comparePastRates(tierId, rateElms, rates);
         lastRates = {...rates};
-        document.querySelectorAll(`.${tierId}-rate`).forEach(el => el.innerText = rates[tierId].toFixed(2));
+        rateElms.forEach(el => el.innerText = rates[tierId].toFixed(2));
       }
 
       for (const queueId of Object.keys(QUEUE_CONFIGS)) { 
@@ -238,14 +254,11 @@
         queueOn = (currentQueueMessageCounts[queueId] > 0) ? 1 : 0;
         rates[queueId] = (queueOn / tierActiveSubsCount) * tierRate;
         rates[queueId] = isNaN(rates[queueId]) ? 0 : rates[queueId];
-          durations[queueId] = rates[queueId] === 0 ? DEFAULT_QUEUE_DURATION : Math.ceil(1 / rates[queueId] * (DEFAULT_QUEUE_DURATION * MPS_TO_DURATION_MS));
-
-          document.querySelector(`#${queueId}-rate`).innerText = rates[queueId].toFixed(2);
-          QUEUE_CONFIGS[queueId].duration = durations[queueId];
-
-          if (durations[queueId] !== lastDurations[queueId]) {
-              flashRectangle(document.querySelector(`#${queueId}`));
-          }
+        durations[queueId] = rates[queueId] === 0 ? DEFAULT_QUEUE_DURATION : Math.ceil(1 / rates[queueId] * (DEFAULT_QUEUE_DURATION * MPS_TO_DURATION_MS));
+        let queueRateElms = document.querySelectorAll(`#${queueId}-rate`);
+        comparePastRates(queueId, queueRateElms, rates);
+        queueRateElms.forEach(el => el.innerText = rates[queueId].toFixed(2));
+        QUEUE_CONFIGS[queueId].duration = durations[queueId];
       }
 
       lastDurations = {...durations};

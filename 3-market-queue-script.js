@@ -14,9 +14,8 @@
 
   let titles = [
       { 
-          "borderId": "path-3",
-          "title": "PARENT AC + US-ATT + SHORT CODE SMS QUEUE",
-          "subtitle": "75 MPS"
+          "borderId": "parent",
+          "title": "US-ATT SHORT CODE SMS QUEUE <span class='mps'>TOTAL [75 MPS]</span>",
       },
   ];
   let POSITIONS;
@@ -45,7 +44,7 @@
       
       const titleDiv = document.createElement('div');
       titleDiv.className = 'svg-title';
-      titleDiv.innerText = title;
+      titleDiv.innerHTML = title;
       titleDiv.style.left = `${bbox.x + 6}px`;
       titleDiv.style.top = `${bbox.y - 14}px`;
 

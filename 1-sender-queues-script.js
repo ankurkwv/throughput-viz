@@ -19,18 +19,18 @@
       },
       { 
           "borderId": "path-3",
-          "title": "SUB AC2 / Sender-Queue 55222",
-          "subtitle": "25 MPS"
+          "title": "Sender-Queue 55222",
+          "subtitle": "<span class='mps'>25 MPS</span>"
       },,
       { 
           "borderId": "path-5",
-          "title": "SUB AC1 / Sender-Queue 23211",
-          "subtitle": "25 MPS"
+          "title": "Sender-Queue 23211",
+          "subtitle": "<span class='mps'>25 MPS</span>"
       },
       { 
           "borderId": "path-7",
-          "title": "SUB AC3 / Sender-Queue 78787",
-          "subtitle": "25 MPS"
+          "title": "Sender-Queue 78787",
+          "subtitle": "<span class='mps'>25 MPS</span>"
       },
   ];
   let POSITIONS;
@@ -71,7 +71,7 @@
       if (subtitle) {
         const subtitleDiv = document.createElement('div');
         subtitleDiv.className = 'svg-subtitle';
-        subtitleDiv.innerText = subtitle;
+        subtitleDiv.innerHTML = subtitle;
         subtitleDiv.style.right = `${bbox.xRight}px`;
         document.body.appendChild(subtitleDiv);
         subtitleDiv.style.top = `${bbox.yBottom - subtitleDiv.offsetHeight}px`;

@@ -13,18 +13,15 @@
   let titles = [
       { 
           "borderId": "path-1",
-          "title": "US-ATT SHORT CODE SMS QUEUES",
-          "subtitle": TOTAL_MPS + " MPS TOTAL"
+          "title": "US-ATT SHORT CODE SMS QUEUE <span class='mps'>TOTAL [" + TOTAL_MPS + " MPS]</span>",
       },
       { 
-          "borderId": "sl-1",
-          "title": "Important (Traffic Shaping Service Level 1)",
-          "subtitle": "[<span id='sl-1-rate'>0.00</span>/" + TOTAL_MPS + " MPS]"
+          "borderId": "important",
+          "title": "Important <span class='mps'>SL1 70% weight [<span id='sl-1-rate' class='rates'>0.00</span>/" + TOTAL_MPS + " MPS]</span>",
       },
       { 
-          "borderId": "sl-2",
-          "title": "Regular (Traffic Shaping Service Level 2)",
-          "subtitle": "[<span id='sl-2-rate'>0.00</span>/" + TOTAL_MPS + " MPS]"
+          "borderId": "regular",
+          "title": "Regular <span class='mps'>SL2 30% weight [<span id='sl-2-rate' class='rates'>0.00</span>/" + TOTAL_MPS + " MPS]</span>",
       },
   ];
   let POSITIONS;
@@ -163,19 +160,35 @@
       });
     }
 
+    let flashingSet = new Set();
     const flashRectangle = (rectangle) => {
+      if (flashingSet.has(rectangle)) return;
+      flashingSet.add(rectangle);
+      let backgroundOg = getComputedStyle(rectangle).backgroundColor;
       anime({
         targets: rectangle,
-        fill: [
+        backgroundColor: [
           { value: '#FFFFB3', duration: 200, easing: 'easeOutSine' },
-          { value: '#D8D8D8', duration: 200, easing: 'easeInSine' }
+          { value: backgroundOg, duration:200, easing: 'easeInSine' }
         ],
         delay: anime.stagger(100),
-        loop: false
+        loop: false,
+        begin: () => {
+        },
+        complete: () => {
+          flashingSet.delete(rectangle);
+        }
       });
     }
 
-    let lastDurations = {};
+    let pastRates = {};
+    const comparePastRates = (id, elms, currentRates) => {
+      if (pastRates[id] !== currentRates[id]) {
+        elms.forEach(el => flashRectangle(el));
+      }
+      pastRates[id] = currentRates[id]; 
+    }
+
     const shape = () => {
       let rates = {};
       let durations = {};
@@ -189,50 +202,14 @@
           queueOn = (currentQueueMessageCounts[queueId] > 0) ? 1 : 0;
           rates[queueId] = (totalWeight === 0) ? 0 : (queueOn * QUEUE_CONFIGS[queueId].weight / totalWeight) * TOTAL_MPS;
           durations[queueId] = rates[queueId] === 0 ? DEFAULT_QUEUE_DURATION : Math.ceil(1 / rates[queueId] * (DEFAULT_QUEUE_DURATION * MPS_TO_DURATION_MS));
-
-          document.querySelector(`#${queueId}-rate`).innerText = rates[queueId].toFixed(2);
+          let queueRateElms = document.querySelectorAll(`#${queueId}-rate`);
+          comparePastRates(queueId, queueRateElms, rates);
+          queueRateElms.forEach(el => el.innerText = rates[queueId].toFixed(2));
           QUEUE_CONFIGS[queueId].duration = durations[queueId];
-
-          if (durations[queueId] !== lastDurations[queueId]) {
-              flashRectangle(document.querySelector(`#${queueId}`));
-          }
       }
 
       lastDurations = {...durations};
   };
-
-    const shaped = () => {
-      let mps = 75;
-      let sl1_w = 50;
-      let sl2_w = 20;
-      let sl1_on = (currentQueueMessageCounts['sl-1'] > 0) ? 1 : 0;
-      let sl2_on = (currentQueueMessageCounts['sl-2'] > 0) ? 1 : 0;
-
-      sl1_rate = ((sl1_w * sl1_on) / ((sl1_w * sl1_on) + (sl2_w * sl2_on))) * mps;
-      sl2_rate = ((sl2_w * sl2_on) / ((sl1_w * sl1_on) + (sl2_w * sl2_on))) * mps;
-
-      sl1_rate = isNaN(sl1_rate) ? 0 : sl1_rate;
-      sl2_rate = isNaN(sl2_rate) ? 0 : sl2_rate;
-
-      document.querySelector('#sl-1-rate').innerText = sl1_rate.toFixed(2);
-      document.querySelector('#sl-2-rate').innerText = sl2_rate.toFixed(2);
-
-      sl1_duration = (sl1_rate == 0) ? DEFAULT_QUEUE_DURATION : Math.ceil(1 / sl1_rate * (DEFAULT_QUEUE_DURATION * 60));
-      sl2_duration = (sl2_rate == 0) ? DEFAULT_QUEUE_DURATION : Math.ceil(1 / sl2_rate * (DEFAULT_QUEUE_DURATION * 60));
-
-      if (sl1_duration - lastSl1 !== 0) {
-        flashRectangle(document.querySelector(`#sl-1`));
-      }
-      if (sl2_duration - lastSl2 !== 0) {
-        flashRectangle(document.querySelector(`#sl-2`));
-      }
-
-      lastSl1 = sl1_duration;
-      lastSl2 = sl2_duration;
-
-      QUEUE_CONFIGS['sl-1'].duration = sl1_duration;
-      QUEUE_CONFIGS['sl-2'].duration = sl2_duration;
-    }
 
     const serviceMessage = (msg, queueId, step) => {
       const queueConfig = QUEUE_CONFIGS[queueId];
