@@ -422,11 +422,11 @@
         targets: '#play',
         backgroundColor: [
           { value: '#FFFFB3', duration: 200, easing: 'easeOutSine' },
-          { value: backgroundOg, duration:200, easing: 'easeInSine' }
+          { value: '#0e0e0e', duration:200, easing: 'easeInSine' }
         ],
         delay: anime.stagger(100),
         loop: true,
-        endDelay: 400,
+        endDelay: 4000,
         begin: () => {
         },
         complete: () => {
