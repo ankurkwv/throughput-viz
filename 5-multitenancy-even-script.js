@@ -13,7 +13,7 @@
   let titles = [
       { 
           "borderId": "path-1",
-          "title": "US-ATT SHORT CODE SMS QUEUES",
+          "title": "US-ATT SHORT CODE SMS QUEUE",
           "subtitle": TOTAL_MPS + " MPS TOTAL"
       },
       { 

@@ -13,7 +13,7 @@
   let titles = [
       { 
           "borderId": "parent-queue",
-          "title": "US-ATT SHORT CODE SMS QUEUES <span class='mps'>TOTAL [" + TOTAL_MPS + " MPS]</span>",
+          "title": "US-ATT SHORT CODE SMS QUEUE <span class='mps'>TOTAL [" + TOTAL_MPS + " MPS]</span>",
       },
       { 
           "borderId": "tier-1",
@@ -55,9 +55,9 @@
   };
 
   let QUEUE_CONFIGS = {
-      'sub-1': {queueId: 'sub-1', duration: DEFAULT_QUEUE_DURATION, steps: 6, weight: 1, tier: 'tier-2'},
-      'sub-2': {queueId: 'sub-2', duration: DEFAULT_QUEUE_DURATION, steps: 6, weight: 1, tier: 'tier-2'},
-      'sub-3': {queueId: 'sub-3', duration: DEFAULT_QUEUE_DURATION, steps: 6, weight: 1, tier: 'tier-1'},
+      'sub-1': {queueId: 'sub-1', duration: DEFAULT_QUEUE_DURATION, steps: 8, weight: 1, tier: 'tier-2'},
+      'sub-2': {queueId: 'sub-2', duration: DEFAULT_QUEUE_DURATION, steps: 8, weight: 1, tier: 'tier-2'},
+      'sub-3': {queueId: 'sub-3', duration: DEFAULT_QUEUE_DURATION, steps: 8, weight: 1, tier: 'tier-1'},
   };
 
   const createDiv = (className, text, style) => {
