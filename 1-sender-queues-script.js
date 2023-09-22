@@ -50,36 +50,6 @@
       {queueId: 'queue-3', duration: 5000},
   ];
 
-  const addTitles = () => {
-    titles.forEach(({borderId, title, subtitle}) => {
-      const borderElement = document.querySelector(`#${borderId}`);
-
-      if(!borderElement) {
-        return;
-      }
-
-      const bbox = getAugmentedBbox(borderElement, true);
-      
-      const titleDiv = document.createElement('div');
-      titleDiv.className = 'svg-title';
-      titleDiv.innerText = title;
-      titleDiv.style.left = `${bbox.x + 6}px`;
-      titleDiv.style.top = `${bbox.y - 14}px`;
-
-      document.body.appendChild(titleDiv);
-
-      if (subtitle) {
-        const subtitleDiv = document.createElement('div');
-        subtitleDiv.className = 'svg-subtitle';
-        subtitleDiv.innerHTML = subtitle;
-        subtitleDiv.style.right = `${bbox.xRight}px`;
-        document.body.appendChild(subtitleDiv);
-        subtitleDiv.style.top = `${bbox.yBottom - subtitleDiv.offsetHeight}px`;
-      }
-
-    });
-  }
-
   const resetAnimations = () => {
     // Step 1: Clear all timeouts
     timeoutIds.forEach(timeoutId => clearTimeout(timeoutId));

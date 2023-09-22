@@ -42,30 +42,6 @@
       'sl-2': {queueId: 'sl-2', duration: DEFAULT_QUEUE_DURATION , steps: 6, weight: 20},
   };
 
-  const createDiv = (className, text, style) => {
-    const div = document.createElement('div');
-    div.className = className;
-    if (text) div.innerHTML = text;
-    Object.assign(div.style, style);
-    document.body.appendChild(div);
-    return div;
-  };
-
-  const addTitles = () => {
-    titles.forEach(({borderId, title, subtitle}) => {
-      const borderElement = document.querySelector(`#${borderId}`);
-      if(!borderElement) return;
-
-      const bbox = getAugmentedBbox(borderElement, true);
-      const titleDiv = createDiv('svg-title', title, { left: `${bbox.x + 6}px`, top: `${bbox.y - 14}px` });
-
-      if (subtitle) {
-        const subtitleDiv = createDiv('svg-subtitle', subtitle, { right: `${bbox.xRight}px`});
-        subtitleDiv.style.top = `${bbox.yBottom - subtitleDiv.offsetHeight}px`;
-      }
-    });
-  };
-
   const resetAnimations = () => {
     // Step 1: Clear all timeouts
     timeoutIds.forEach(timeoutId => clearTimeout(timeoutId));
