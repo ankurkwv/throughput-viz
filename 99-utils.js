@@ -1,3 +1,41 @@
+let flashingSet = new Set();
+const flashRectangle = (rectangle) => {
+  if (flashingSet.has(rectangle)) return;
+  flashingSet.add(rectangle);
+  let backgroundOg = getComputedStyle(rectangle).backgroundColor;
+  let colorOg = getComputedStyle(rectangle).color;
+  anime({
+    targets: rectangle,
+    color: [
+      { value: '#000', duration: 150, easing: 'easeOutSine' },
+      { value: colorOg, duration:300, easing: 'easeInSine' },
+      { value: '#000', duration: 100, easing: 'easeOutSine' },
+      { value: colorOg, duration:200, easing: 'easeInSine' },
+    ],
+    backgroundColor: [
+      { value: '#FFFFB3', duration: 150, easing: 'easeOutSine' },
+      { value: backgroundOg, duration:300, easing: 'easeInSine' },
+      { value: '#FFFFB3', duration: 100, easing: 'easeOutSine' },
+      { value: backgroundOg, duration:200, easing: 'easeInSine' },
+    ],
+    delay: anime.stagger(150),
+    loop: false,
+    begin: () => {
+    },
+    complete: () => {
+      flashingSet.delete(rectangle);
+    }
+  });
+}
+
+let pastRates = {};
+const comparePastRates = (id, elms, currentRates) => {
+  if (pastRates[id] !== currentRates[id]) {
+    elms.forEach(el => flashRectangle(el));
+  }
+  pastRates[id] = currentRates[id]; 
+}
+
 window.addEventListener('load', function() {
   registerResizeEvent();
 });
@@ -96,3 +134,8 @@ const getAugmentedBbox = (element, scaled = false) => {
   bbox.yBottom = bbox.y + bbox.height;
   return bbox;
 };
+
+
+const pulsePlay = () => {
+  // implement later
+}

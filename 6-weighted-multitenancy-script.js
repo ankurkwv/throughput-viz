@@ -154,38 +154,6 @@
       });
     }
 
-    let flashingSet = new Set();
-    const flashRectangle = (rectangle) => {
-      if (flashingSet.has(rectangle)) return;
-      flashingSet.add(rectangle);
-      let backgroundOg = getComputedStyle(rectangle).backgroundColor;
-      anime({
-        targets: rectangle,
-        backgroundColor: [
-          { value: '#FFFFB3', duration: 200, easing: 'easeOutSine' },
-          { value: backgroundOg, duration:200, easing: 'easeInSine' }
-        ],
-        delay: anime.stagger(100),
-        loop: false,
-        begin: () => {
-        },
-        complete: () => {
-          flashingSet.delete(rectangle);
-        }
-      });
-    }
-
-    let pastRates = {};
-    const comparePastRates = (id, elms, currentRates) => {
-      if (pastRates[id] !== currentRates[id]) {
-        elms.forEach(el => flashRectangle(el));
-      }
-      pastRates[id] = currentRates[id]; 
-    }
-
-    let lastDurations = {};
-    let lastRates = {};
-
     const shape = () => {
       // console.clear();
       let rates = {};
@@ -217,7 +185,6 @@
         rates[tierId] = isNaN(rates[tierId]) ? 0 : rates[tierId];
         let rateElms = document.querySelectorAll(`.${tierId}-rate`);
         comparePastRates(tierId, rateElms, rates);
-        lastRates = {...rates};
         rateElms.forEach(el => el.innerText = rates[tierId].toFixed(2));
       }
 
@@ -234,8 +201,6 @@
         queueRateElms.forEach(el => el.innerText = rates[queueId].toFixed(2));
         QUEUE_CONFIGS[queueId].duration = durations[queueId];
       }
-
-      lastDurations = {...durations};
   };
 
     const serviceMessage = (msg, queueId, step) => {
@@ -322,19 +287,6 @@
             startTime += messageSpacing;
         }
     });
-  }
-
-  const pulsePlay = () => {
-    // anime({
-    //   targets: '#play',
-    //   scale: [1, 1.1, 1],
-    //   backgroundColor: ['rgb(22 27 36)', 'rgb(255, 255, 179)', 'rgb(22 27 36)'], // Alternates between two colors
-    //   boxShadow: ['0px 0px 0px 0px rgba(255, 255, 179, 0)', '0px 0px 5px 5px rgba(255, 255, 179, .3)', '0px 0px 0px 0px rgba(255, 255, 179, 0)'], // Increases the box-shadow
-    //   duration: 500,
-    //   loop: true,
-    //   easing: 'easeInOutSine',
-    //   endDelay: 5000,
-    // });
   }
 
   document.addEventListener("DOMContentLoaded", () => {

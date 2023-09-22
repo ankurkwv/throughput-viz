@@ -193,34 +193,6 @@
       });
     }
 
-    let flashingSet = new Set();
-    const flashRectangle = (rectangle) => {
-      if (flashingSet.has(rectangle)) return;
-      flashingSet.add(rectangle);
-      let backgroundOg = getComputedStyle(rectangle).backgroundColor;
-      anime({
-        targets: rectangle,
-        backgroundColor: [
-          { value: '#FFFFB3', duration: 200, easing: 'easeOutSine' },
-          { value: backgroundOg, duration:200, easing: 'easeInSine' }
-        ],
-        delay: anime.stagger(100),
-        loop: false,
-        begin: () => {
-        },
-        complete: () => {
-          flashingSet.delete(rectangle);
-        }
-      });
-    }
-
-    let pastRates = {};
-    const comparePastRates = (id, elms, currentRates) => {
-      if (pastRates[id] !== currentRates[id]) {
-        elms.forEach(el => flashRectangle(el));
-      }
-      pastRates[id] = currentRates[id]; 
-    }
     const shape = () => {
       console.clear();
       // this function is called every time a message enters or leaves any queue
@@ -389,23 +361,6 @@
             startTime += messageSpacing;
         }
     });
-  }
-
-  const pulsePlay = () => {
-      anime({
-        targets: '#play',
-        backgroundColor: [
-          { value: '#FFFFB3', duration: 200, easing: 'easeOutSine' },
-          { value: '#0e0e0e', duration:200, easing: 'easeInSine' }
-        ],
-        delay: anime.stagger(100),
-        loop: true,
-        endDelay: 4000,
-        begin: () => {
-        },
-        complete: () => {
-        }
-      });
   }
 
   document.addEventListener("DOMContentLoaded", () => {

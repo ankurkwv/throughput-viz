@@ -32,7 +32,7 @@
       { 
           "borderId": "path-9",
           "title": "Account Based Rate Limit",
-          "subtitle": "<span class='mps'>75 MPS</span>"
+          "subtitle": "<span class='mps'>300 MPS ABRL</span>"
       },
   ];
   let POSITIONS;

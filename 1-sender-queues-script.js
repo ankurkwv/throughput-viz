@@ -20,17 +20,17 @@
       { 
           "borderId": "path-3",
           "title": "Sender-Queue 55222",
-          "subtitle": "<span class='mps'>25 MPS</span>"
+          "subtitle": "<span class='mps'>Default 100MPS SC</span>"
       },,
       { 
           "borderId": "path-5",
           "title": "Sender-Queue 23211",
-          "subtitle": "<span class='mps'>25 MPS</span>"
+          "subtitle": "<span class='mps'>Default 100MPS SC</span>"
       },
       { 
           "borderId": "path-7",
           "title": "Sender-Queue 78787",
-          "subtitle": "<span class='mps'>25 MPS</span>"
+          "subtitle": "<span class='mps'>Default 100MPS SC</span>"
       },
   ];
   let POSITIONS;
