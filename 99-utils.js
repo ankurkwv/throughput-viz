@@ -1,3 +1,5 @@
+const TOTAL_MPS = 100;
+
 let flashingSet = new Set();
 const flashRectangle = (rectangle) => {
   if (flashingSet.has(rectangle)) return;

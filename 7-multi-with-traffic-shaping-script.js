@@ -8,7 +8,6 @@
     'ac1-sl1', 'ac2-sl1', 'ac3-sl1',
     'ac1-sl2', 'ac2-sl2', 'ac3-sl2'
   ];
-  const TOTAL_MPS = 75;
   const MPS_TO_DURATION_MS = 60;
   let titles = [
       { 

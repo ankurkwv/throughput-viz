@@ -15,7 +15,7 @@
   let titles = [
       { 
           "borderId": "parent",
-          "title": "US-ATT SHORT CODE SMS QUEUE <span class='mps'>TOTAL [75 MPS]</span>",
+          "title": "US-ATT SHORT CODE SMS QUEUE <span class='mps'>TOTAL [" + TOTAL_MPS + " MPS]</span>",
       },
   ];
   let POSITIONS;

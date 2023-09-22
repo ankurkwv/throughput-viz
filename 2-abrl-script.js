@@ -17,17 +17,17 @@
       { 
           "borderId": "path-3",
           "title": "Sender-Queue 55222",
-          "subtitle": "<span class='mps'>75 MPS</span>"
+          "subtitle": "<span class='mps'>300 MPS</span>"
       },,
       { 
           "borderId": "path-5",
           "title": "Sender-Queue 23211",
-          "subtitle": "<span class='mps'>75 MPS</span>"
+          "subtitle": "<span class='mps'>300 MPS</span>"
       },
       { 
           "borderId": "path-7",
           "title": "Sender-Queue 78787",
-          "subtitle": "<span class='mps'>75 MPS</span>"
+          "subtitle": "<span class='mps'>300 MPS</span>"
       },
       { 
           "borderId": "path-9",
