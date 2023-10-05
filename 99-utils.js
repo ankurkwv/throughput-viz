@@ -67,7 +67,7 @@ const respositionTitles = () => {
     if(!borderElement) return;
     const bbox = getAugmentedBbox(borderElement, true);
     if (title.titleDiv) {
-      let style = { left: `${bbox.x + 6}px`, top: `${bbox.y - 14}px` };
+      let style = { left: `${bbox.x-2}px`, top: `${bbox.y-8}px` };
       Object.assign(title.titleDiv.style, style);
     }
 
@@ -88,7 +88,6 @@ const createDiv = (className, text) => {
 
 const addTitles = () => {
   titles.forEach((title) => {
-
     if (title.title && isNaN(title.titleDiv)) {
       title.titleDiv = createDiv('svg-title', title.title);
     }

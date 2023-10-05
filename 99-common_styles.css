@@ -57,7 +57,8 @@ body {
 .svg-title, .svg-subtitle {
     position: absolute;
     background-color: #0E0E0E;
-    padding: 1px 3px;
+    padding: 0px 4px;
+    border-radius: 4px;
     font-family: 'Arial Black', sans-serif;
     font-size: 9px;
     letter-spacing: 1px;
@@ -71,6 +72,7 @@ body {
     font-size: 8px;
     padding: 3px 8px;
     border-radius: 4px;
+    margin-right: -5px;
 
 }
 
